@@ -25,3 +25,5 @@ is WSLg GUI.
 - show window near target cursor position
 - good looking window (^^)
 
+## build this
+- Visual Studio 2022
