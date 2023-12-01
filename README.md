@@ -25,5 +25,8 @@ is WSLg GUI.
 - show window near target cursor position
 - good looking window (^^)
 
+Hotkey registration in this program does not work well.
+Thanks to [this](https://anis774.net/codevault/hotkey.html) page.
+
 ## build this
 - Visual Studio 2022
