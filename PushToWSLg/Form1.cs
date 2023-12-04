@@ -30,10 +30,8 @@ namespace PushToWSLg
 
         void hotKey_HotKeyPush(object sender, EventArgs e)
         {
-            string text = textBox1.Text;
-            text += (char)Keys.Enter;
+            this.Activate();
 
-            InsertClipboardTextAtCursor(text);
         }
 
         private void Form1_FormClosing(object sender, FormClosingEventArgs e)
@@ -80,8 +78,11 @@ namespace PushToWSLg
                 string text = textBox1.Text;
                 textBox1.Clear();
 
-                text += (char)Keys.Enter;
-
+                if (text.Length == 0)
+                {
+                    text += (char)Keys.Enter;
+                }
+                
                 InsertClipboardTextAtCursor(text);
 
                 e.Handled = true;
