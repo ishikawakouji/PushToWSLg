@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Drawing;
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -30,6 +31,19 @@ namespace PushToWSLg
 
         void hotKey_HotKeyPush(object sender, EventArgs e)
         {
+            // get mouse cursor position
+            POINT cursorPos;
+            GetCursorPos(out cursorPos);
+
+            int x = cursorPos.X - this.Width;
+            int y = cursorPos.Y - this.Height;
+
+            if (x<0) { x = 0; }
+            if (y<0) { y = 0; }
+            
+            // set right bottom corner to mouse cursor
+            this.SetDesktopLocation(x,y);
+
             this.Activate();
 
         }
