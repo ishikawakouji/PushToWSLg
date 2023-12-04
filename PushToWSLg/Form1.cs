@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Drawing;
 using System.Runtime.InteropServices;
+using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
@@ -10,11 +11,27 @@ namespace PushToWSLg
     {
         HotKey hotKey;
 
-        //[DllImport("user32.dll")]
-        //static extern IntPtr GetForegroundWindow();
+        // caret position
+        [DllImport("user32.dll", EntryPoint = "GetCaretPos")]
+        static extern bool GetCaretPos(out Point lpPoint);
 
-        //[DllImport("user32.dll")]
-        //static extern bool SetForegroundWindow(IntPtr hWnd);
+        [DllImport("user32.dll")]
+        static extern IntPtr GetForegroundWindow();
+
+        [DllImport("user32.dll")]
+        static extern IntPtr AttachThreadInput(IntPtr idAttach, IntPtr idAttachTo, bool fAttach);
+
+        [DllImport("user32.dll")]
+        static extern IntPtr GetWindowThreadProcessId(IntPtr hWnd, IntPtr lpdwProcessId);
+
+        [DllImport("kernel32.dll")]
+        static extern IntPtr GetCurrentThreadId();
+
+        [DllImport("user32.dll")]
+        static extern IntPtr GetFocus();
+
+        [DllImport("user32.dll")]
+        static extern bool ClientToScreen(IntPtr hwnd, out Point lpPoint);
 
         public PushToWSLg()
         {
@@ -31,17 +48,35 @@ namespace PushToWSLg
 
         void hotKey_HotKeyPush(object sender, EventArgs e)
         {
-            // get mouse cursor position
-            POINT cursorPos;
-            GetCursorPos(out cursorPos);
+            // get caret xy
+            IntPtr hWnd = GetForegroundWindow();
 
-            int x = cursorPos.X - this.Width;
-            int y = cursorPos.Y - this.Height;
+            IntPtr current = GetCurrentThreadId();
+            IntPtr target = GetWindowThreadProcessId(hWnd, IntPtr.Zero);
+
+            Point p;
+            AttachThreadInput(current, target, true);
+
+            GetCaretPos(out p);
+            IntPtr fWnd = GetFocus();
+            ClientToScreen(fWnd, out p);
+
+            AttachThreadInput(current, target, false);
+
+            // get mouse cursor position
+            //POINT cursorPos;
+            //GetCursorPos(out cursorPos);
+
+            //int x = cursorPos.X - this.Width;
+            //int y = cursorPos.Y - this.Height;
+
+            int x = p.X - this.Width;
+            int y = p.Y - this.Height;
 
             if (x<0) { x = 0; }
             if (y<0) { y = 0; }
             
-            // set right bottom corner to mouse cursor
+            // set right bottom corner to cursor
             this.SetDesktopLocation(x,y);
 
             this.Activate();
