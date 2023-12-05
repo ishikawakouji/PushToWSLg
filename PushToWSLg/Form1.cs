@@ -99,13 +99,22 @@ namespace PushToWSLg
         static extern bool GetCursorPos(out POINT lpPoint);
 
         // カーソル位置にクリップボードのテキストを挿入
-        private async void InsertClipboardTextAtCursor(string text)
+        private void InsertClipboardTextAtCursor(string text)
         {
-            POINT cursorPos;
+
 
             Clipboard.SetText(text);
             //Clipboard.SetDataObject(text, false);
 
+            SendKeyEventToAnotherWindow("^v");
+
+
+        }
+
+        // send key event
+        private async void SendKeyEventToAnotherWindow(string etext)
+        {
+            POINT cursorPos;
             this.Hide();
 
             await Task.Delay(200);
@@ -113,7 +122,7 @@ namespace PushToWSLg
             if (GetCursorPos(out cursorPos))
             {
                 // カーソル位置にクリップボードのテキストを挿入
-                SendKeys.SendWait("^v");
+                SendKeys.SendWait(etext);
             }
 
             this.Show();
@@ -121,7 +130,6 @@ namespace PushToWSLg
 
         private void textBox1_KeyPress(object sender, KeyPressEventArgs e)
         {
-            /*
             int textlen = textBox1.Text.Length;
             string text = "";
             bool flagpaste = true;
@@ -130,22 +138,6 @@ namespace PushToWSLg
 
             switch (e.KeyChar)
             {
-                case (char)Keys.Left:
-                case (char)Keys.Right:
-                case (char)Keys.Back:
-                    if (textlen == 0)
-                    {
-                        text += e.KeyChar;
-                    }
-                    else
-                    {
-                        flagpaste = false;
-                    }
-                    break;
-                case (char)Keys.Up:
-                case (char)Keys.Down:
-                    text += e.KeyChar;
-                    break;
                 case (char)Keys.Enter:
                     text = textBox1.Text;
                     textBox1.Clear();
@@ -164,9 +156,8 @@ namespace PushToWSLg
             {
                 InsertClipboardTextAtCursor(text);
             }
-            */
-
             
+            /*
             if (e.KeyChar == (char)Keys.Enter)
             {
                 string text = textBox1.Text;
@@ -182,7 +173,45 @@ namespace PushToWSLg
                 e.Handled = true;
 
             }
+            */
             
+        }
+
+        private void textBox1_PreviewKeyDown(object sender, PreviewKeyDownEventArgs e)
+        {
+            int textlen = textBox1.Text.Length;
+            string etext = "";
+
+            // enter, arrow, backspace
+            if (textlen == 0)
+            {
+                switch (e.KeyCode)
+                {
+                    case Keys.Up:
+                        etext = "{UP}";
+                        break;
+                    case Keys.Down:
+                        etext = "{DOWN}";
+                        break;
+                    case Keys.Left:
+                        etext = "{LEFT}";
+                        break;
+                    case Keys.Right:
+                        etext = "{RIGHT}";
+                        break;
+                    case Keys.Back:
+                        etext = "{BS}";
+                        break;
+                    default:
+                        break;
+                }
+                if (etext.Length != 0)
+                {
+                    SendKeyEventToAnotherWindow(etext);
+                }
+
+            }
+
         }
 
     }
